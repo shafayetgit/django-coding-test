@@ -194,33 +194,27 @@ def search_product(request):
     price_to = request.GET.get('price_to')
     date = request.GET.get('date')
 
-    redirect('product:list.product')
-
     if title:
         products = Product.objects.filter(title__icontains=title)
     elif variant:
-       products = Product.objects.filter(product_variants__variant__id=variant)
-       print(variant)
+        products = Product.objects.filter(product_variants__variant__id=variant)
     elif price_from and price_to:
         products = Product.objects.filter(product_variant_prices__price__gte=int(price_from), product_variant_prices__price__lte=int(price_to))
     elif price_from:
-        print(type(price_from))
         products = Product.objects.filter(product_variant_prices__price__gte=int(price_from))
     elif price_to:
         products = Product.objects.filter(product_variant_prices__price_lte=int(price_to))
     elif date:
         products = Product.objects.filter(created_at=date) | Product.objects.filter(created_at__gte=date)
-        print(date)
-    elif date:
-        products = Product.objects.filter(updated_at=date)
     else:
         return redirect('product:list.product')
 
 
     context = {
-        'total_records': products.count,
-        'products': products,
-        'variants': Variant.objects.all()
+         'total_records': products.count,
+         'products': products,
+         'variants': Variant.objects.all()
+
     }
     return render(request, 'products/list.html', context)
 
