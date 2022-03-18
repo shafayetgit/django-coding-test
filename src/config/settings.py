@@ -35,10 +35,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'django_extensions',
     'rest_framework',
     'authentication',
-    'product'
+    'product',
+
 ]
 
 MIDDLEWARE = [
@@ -132,3 +134,16 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/dashboard'
+
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000',
+]
+
+
+REST_FRAMEWORK={
+    'DEFAULT_PERMISION_CLASSES':(
+        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+}

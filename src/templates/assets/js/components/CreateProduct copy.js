@@ -5,10 +5,17 @@ import "react-tagsinput/react-tagsinput.css";
 import Dropzone from "react-dropzone";
 
 const CreateProduct = (props) => {
+  // const config = {
+  //   method: "get",
+  //   url: "http://localhost:8000/api/product/",
+  // };
+  // axios(config).then((res) => {
+  //   console.log(res);
+  // });
+
   const [title, setTitle] = useState("");
   const [sku, setSku] = useState("");
   const [description, setDescription] = useState("");
-  const [productVariantPrices, setProductVariantPrices] = useState([]);
   const [productVariants, setProductVariant] = useState([
     {
       option: 1,
@@ -16,13 +23,14 @@ const CreateProduct = (props) => {
     },
   ]);
 
-  // To get csrf token
+  const [productVariantPrices, setProductVariantPrices] = useState([]);
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {
       const cookies = document.cookie.split(";");
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
         if (cookie.substring(0, name.length + 1) === name + "=") {
           cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
           break;
@@ -41,7 +49,6 @@ const CreateProduct = (props) => {
     let available_variants = all_variants.filter(
       (entry1) => !selected_variants.some((entry2) => entry1 == entry2)
     );
-    
     setProductVariant([
       ...productVariants,
       {
@@ -54,9 +61,8 @@ const CreateProduct = (props) => {
   // handle input change on tag input
   const handleInputTagOnChange = (value, index) => {
     let product_variants = [...productVariants];
-    product_variants[index].tags = value;
+    product_variants[index].tags = value.target.value;
     setProductVariant(product_variants);
-
     checkVariant();
   };
 
@@ -76,7 +82,7 @@ const CreateProduct = (props) => {
     });
 
     setProductVariantPrices([]);
-
+    console.log(tags)
     getCombn(tags).forEach((item) => {
       setProductVariantPrices((productVariantPrice) => [
         ...productVariantPrice,
@@ -95,22 +101,12 @@ const CreateProduct = (props) => {
     if (!arr.length) {
       return pre;
     }
-    let ans = arr[0].reduce(function (ans, value) {
+    let ans = arr.reduce(function (ans, value) {
       return ans.concat(getCombn(arr.slice(1), pre + value + "/"));
     }, []);
     return ans;
   }
-  console.log(productVariants)
-  const handleProductVariantPrice = (e) =>{
-    var index = e.target.getAttribute('data-index')
-    var productVariantPrice = productVariantPrices[index]
 
-    if(e.target.name == 'price'){
-      productVariantPrice.price = e.target.value
-    }else if(e.target.name == 'stock'){
-      productVariantPrice.stock = e.target.value
-    }
-  }
   // Save product
   let saveProduct = (event) => {
     event.preventDefault();
@@ -121,21 +117,13 @@ const CreateProduct = (props) => {
     formField.append("title", title);
     formField.append("sku", sku);
     formField.append("description", description);
-    var product = {
-      title: title,
-      sku: sku,
-      description: description,
-    };
-
+    formField.append("productVariants", productVariants);
+    console.log(formField);
     axios({
       method: "post",
       headers: { "X-CSRFToken": csrftoken },
       url: "http://localhost:8000/api/product/",
-      data: {
-        product: product,
-        productVariants: productVariants,
-        productVariantPrices: productVariantPrices,
-      },
+      data: formField,
     }).then((res) => {
       console.log(res.data);
     });
@@ -155,6 +143,7 @@ const CreateProduct = (props) => {
                     placeholder="Product Name"
                     className="form-control"
                     name="title"
+                    value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
@@ -162,9 +151,10 @@ const CreateProduct = (props) => {
                   <label htmlFor="">Product SKU</label>
                   <input
                     type="text"
-                    placeholder="Product Sku"
+                    placeholder="Product SKU"
                     className="form-control"
                     name="sku"
+                    value={sku}
                     onChange={(e) => setSku(e.target.value)}
                   />
                 </div>
@@ -175,6 +165,7 @@ const CreateProduct = (props) => {
                     cols="30"
                     rows="4"
                     className="form-control"
+                    defaultValue={description}
                     name="description"
                     onChange={(e) => setDescription(e.target.value)}
                   ></textarea>
@@ -251,13 +242,19 @@ const CreateProduct = (props) => {
                           )}
 
                           <section style={{ marginTop: "30px" }}>
-                            <TagsInput
-                              value={element.tags}
-                              style="margin-top:30px"
-                              onChange={(value) =>
-                                handleInputTagOnChange(value, index)
-                              }
-                            />
+                            <div className="react-tagsinput">
+                              <span>
+                                <input
+                                  type="text"
+                                  defaultValue={element.tags}
+                                  className="react-tagsinput-input"
+                                  placeholder="Add a tag"
+                                  onChange={(value) =>
+                                    handleInputTagOnChange(value, index)
+                                  }
+                                />
+                              </span>
+                            </div>
                           </section>
                         </div>
                       </div>
@@ -293,22 +290,10 @@ const CreateProduct = (props) => {
                             <tr key={index}>
                               <td>{productVariantPrice.title}</td>
                               <td>
-                                <input 
-                                  className="form-control" 
-                                  type="text" 
-                                  name="price"
-                                  data-index={index}
-                                  onChange={handleProductVariantPrice}
-                                />
+                                <input className="form-control" type="text"/>
                               </td>
                               <td>
-                                <input 
-                                className="form-control" 
-                                type="text"
-                                name="stock" 
-                                data-index={index}
-                                onChange={handleProductVariantPrice}
-                                />
+                                <input className="form-control" type="text" />
                               </td>
                             </tr>
                           );

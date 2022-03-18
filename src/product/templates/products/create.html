@@ -14,8 +14,15 @@
     console.log(typeof varients)
     </script>
 
-    <div id="root">
-        <CreateProduct id="variants" data-variants="{{ variants|safe }}"></CreateProduct>
-    </div>
+    {% if product.pk %}
+        <div id="root">
+            <CreateProduct id="variants" data-product_id="{{product.id}}" data-variants="{{ update|safe }}"></CreateProduct>
+        </div>
+    {% else %}
+        <div id="root">
+            <CreateProduct id="variants" data-variants="{{ variants|safe }}"></CreateProduct>
+        </div>
+    {% endif %}
+
 
 {% endblock %}
