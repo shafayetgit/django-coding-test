@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TagsInput from "react-tagsinput";
 import "react-tagsinput/react-tagsinput.css";
@@ -15,6 +15,7 @@ const CreateProduct = (props) => {
       tags: [],
     },
   ]);
+  const [message, setMessage] = useState('')
 
   // To get csrf token
   function getCookie(name) {
@@ -100,7 +101,7 @@ const CreateProduct = (props) => {
     }, []);
     return ans;
   }
-  console.log(productVariants)
+
   const handleProductVariantPrice = (e) =>{
     var index = e.target.getAttribute('data-index')
     var productVariantPrice = productVariantPrices[index]
@@ -111,6 +112,11 @@ const CreateProduct = (props) => {
       productVariantPrice.stock = e.target.value
     }
   }
+
+  useEffect(()=>{
+  
+  },[message])
+
   // Save product
   let saveProduct = (event) => {
     event.preventDefault();
@@ -137,12 +143,22 @@ const CreateProduct = (props) => {
         productVariantPrices: productVariantPrices,
       },
     }).then((res) => {
-      console.log(res.data);
+      if(res.data.error == false){
+        location.reload()
+      }else if (res.data.error == true){
+        setMessage("Data insertion failed! Please try again.")
+      }
     });
   };
 
   return (
     <div>
+      {message ?      
+      <div className="alert alert-success" role="alert">
+        {message}
+      </div> :  ""
+    }
+    
       <section>
         <div className="row">
           <div className="col-md-6">

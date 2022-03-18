@@ -103,7 +103,11 @@
             <div class="col-6">
                 <div class="row justify-content-between">
                     <div class="col-md-6">
-                        <p>Showing {{products.start_index}} to {{products.end_index}} out of {{total_records}} </p>
+                        {% if products.has_other_pages %}
+                            <p>Showing {{products.start_index}} to {{products.end_index}} out of {{total_records}} </p>
+                        {% else %}
+                            <p>Total records {{total_records}} </p>
+                        {% endif %}
                     </div>
                     <div class="col-md-2">
         

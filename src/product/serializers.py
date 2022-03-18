@@ -42,34 +42,3 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = '__all__'
-
-# def search_product(request):
-#     title = request.GET.get('title')
-#     variant = request.GET.get('variant')
-#     price_from = request.GET.get('price_from')
-#     price_to = request.GET.get('price_to')
-#     date = request.GET.get('date')
-
-#     if title:
-#         products = Product.objects.filter(title__icontains=title)
-#     elif variant:
-#         products = Product.objects.filter(product_variants__variant__id=variant)
-#     elif price_from and price_to:
-#         products = Product.objects.filter(product_variant_prices__price__gte=int(price_from), product_variant_prices__price__lte=int(price_to))
-#     elif price_from:
-#         products = Product.objects.filter(product_variant_prices__price__gte=int(price_from))
-#     elif price_to:
-#         products = Product.objects.filter(product_variant_prices__price_lte=int(price_to))
-#     elif date:
-#         products = Product.objects.filter(created_at=date) | Product.objects.filter(created_at__gte=date)
-#     else:
-#         return redirect('product:list.product')
-
-
-#     context = {
-#          'total_records': products.count,
-#          'products': products,
-#          'variants': Variant.objects.all()
-
-#     }
-#     return render(request, 'products/list.html', context)
