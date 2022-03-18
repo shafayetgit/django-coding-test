@@ -146,7 +146,8 @@ const CreateProduct = (props) => {
       if(res.data.error == false){
         location.reload()
       }else if (res.data.error == true){
-        setMessage("Data insertion failed! Please try again.")
+        // setMessage("Data insertion failed! Please try again.")
+        setMessage(JSON.stringify(res.data.message))
       }
     });
   };

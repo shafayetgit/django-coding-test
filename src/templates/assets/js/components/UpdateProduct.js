@@ -5,11 +5,6 @@ import "react-tagsinput/react-tagsinput.css";
 import Dropzone from "react-dropzone";
 
 const UpdateProduct = (props) => {
-  // const [appState, setAppState] = useState({
-  //   product: null,
-  //   productVariants: null,
-  //   productVariantPrices: null,
-  // })
   const [title, setTitle] = useState("");
   const [sku, setSku] = useState("");
   const [description, setDescription] = useState("");
@@ -20,48 +15,16 @@ const UpdateProduct = (props) => {
     },
   ]);
 
-  // const [product, setProduct] = useState({id: '', title: '', sku: '', description:''})
-  // const [productVariants, setproductVariants] = useState('')
-  // const [productVariantPrices, setproductVariantPrices] = useState('')
-
   useEffect(()=>{
     axios({
       method: "get",
       url: "http://localhost:8000/api/product/"+ props.product_id
     }).then((res)=>{
       const data = res.data
-      // setAppState({
-      //   product: data.data, 
-      //   productVariants: data.data.product_variants,
-      //   productVariantPrices: data.data.product_variant_prices,
-      // })
       const product = data.data
       setTitle(product.title)
       setSku(product.sku)
       setDescription(product.description)
-
-      // const product_variants = data.data.product_variants
-      // var p_variant = []
-      // product_variants.map((element, index)=>{
-      //   var tags = []
-      //   product_variants.map((element1, index1)=>{
-      //     if(element.variant == element1.variant && index == index1){
-      //       tags.push(element1.variant_title)
-      //     }
-      //   })
-      //   p_variant.push({option: element.variant, tags:tags})
-      //       // setProductVariant([
-      //       //   ...productVariants,
-      //       //   {
-      //       //     option: element.variant,
-      //       //     tags: [],
-      //       //   },
-      //       // ]);
-      //   // tags.push(element.variant_title)
-      // })
-      // console.log(p_variant)
-      
-      // setproductVariantPrices(data.data.product_variant_prices)
 
     })
 
