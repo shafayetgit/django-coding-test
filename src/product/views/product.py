@@ -12,7 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from product.models import Variant, Product,ProductVariant
 from product.serializers import (
     ProductSerializer, ProductVariantSerializer, 
-    ProductVariantPriceSerializer)
+    ProductVariantPriceSerializer,
+    VariantSerializer)
 
 
 class CreateProductView(generic.TemplateView):
@@ -70,10 +71,12 @@ class ProductViewSet(viewsets.ViewSet):
         products = Product.objects.all()
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
+            
         response_dict = {
             'error': False,
             'message': 'All Products List',
             'data': serializer.data,
+            'variants': variant_serializer.data,
         }
         return Response(response_dict)
 
@@ -122,8 +125,7 @@ class ProductViewSet(viewsets.ViewSet):
         for product_variant_price in product_variant_prices:
             # product_variants = product_variant_price['title'].split('/')
             product_variants = [x for x in product_variant_price['title'].split('/') if x != '']
-            print(product_variant_price['title'])
-            print(product_variants)
+
             product_variant_one = False
             product_variant_two = False
             product_variant_three = False
@@ -165,6 +167,8 @@ class ProductViewSet(viewsets.ViewSet):
 
 
     def retrieve(self, request, pk=None):
+        variants = Variant.objects.all()
+        variant_serializer = VariantSerializer(variants, many=True)
         try:
             if pk is not None:
                 product = Product.objects.get(id=pk)
@@ -173,6 +177,7 @@ class ProductViewSet(viewsets.ViewSet):
                     product, context={'request': request})
 
                 serializer_data = serializer.data
+                serializer_data['variants'] = variant_serializer.data 
                 response_dict = {
                     'error': False,
                     'message': 'Data has been retrieved.',

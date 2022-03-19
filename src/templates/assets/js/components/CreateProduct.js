@@ -136,7 +136,7 @@ const CreateProduct = (props) => {
     axios({
       method: "post",
       headers: { "X-CSRFToken": csrftoken },
-      url: "http://localhost:8000/api/product/",
+      url: location.origin+"/api/product/",
       data: {
         product: product,
         productVariants: productVariants,

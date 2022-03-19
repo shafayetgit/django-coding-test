@@ -1,10 +1,21 @@
 {% extends 'backend/base.html' %}
 
-{% block title %} Create Product {% endblock %}
+{% block title %} 
+{% if product.pk %}
+    Update Product 
+{% else %}
+    Create Product 
+{% endif %}
+{% endblock %}
 
 {% block content %}
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Create Product</h1>
+    {% if product.pk %}
+    <h1 class="h3 mb-0 text-gray-800">Update Product</h1>
+    {% else %}
+    <h1 class="h3 mb-0 text-gray-800">Create Product</h1>
+
+    {% endif %}
         <a href="{% url 'product:create.product' %}" class="float-right btn btn-primary">All Product</a>
     </div>
 

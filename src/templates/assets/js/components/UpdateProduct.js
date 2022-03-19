@@ -8,31 +8,66 @@ const UpdateProduct = (props) => {
   const [title, setTitle] = useState("");
   const [sku, setSku] = useState("");
   const [description, setDescription] = useState("");
-  const [productVariants, setProductVariant] = useState([
-    {
-      option: 1,
-      tags: [],
-    },
-  ]);
+  const [variants, setVariants] = useState([])
+  const [productVariantPrices, setProductVariantPrices] = useState([]);
+  const [productVariants, setProductVariants] = useState([]);
 
   useEffect(()=>{
     axios({
       method: "get",
       url: "http://localhost:8000/api/product/"+ props.product_id
     }).then((res)=>{
+      
       const data = res.data
       const product = data.data
       setTitle(product.title)
       setSku(product.sku)
       setDescription(product.description)
+      // console.log((product.variants).length)
+      // console.log(data.product_variants)
+      var tag_list = []
+      var duplicate_tags = []
+      product.product_variants.forEach((item, index) => {
+        var tags = []
+        product.product_variants.forEach((item1, index2) => {
+          if (item.variant == item1.variant){
+            tags.push(item1.variant_title)
+          }
+        });
+        if (duplicate_tags.includes(item.variant) == false){
+          tag_list.push(
+            {
+              option: item.variant,
+              tags: tags,
+            }
+          )
+          duplicate_tags.push(item.variant)
+        }
+        
+      });
+      console.log(tag_list)
+      setProductVariants(tag_list)
+      setVariants(product.variants)
 
+      var price_list = []
+      product.product_variant_prices.forEach((item)=>{
+              
+       price_list.push({
+          title: (item.product_variant_one.variant_title + '/' + 
+                    item.product_variant_two.variant_title  + '/' +
+                    item.product_variant_three.variant_title),
+          price: item.price,
+          stock: item.stock,
+
+        })
+      })
+      setProductVariantPrices(price_list)
     })
 
   },[])
- 
+  
 
-  // console.log(appState.productVariants)
-  // console.log(appState.productVariants)
+
 
 
   // const [title, setTitle] = useState("");
@@ -46,130 +81,139 @@ const UpdateProduct = (props) => {
   //   },
   // ]);
 
-  // // To get csrf token
-  // function getCookie(name) {
-  //   let cookieValue = null;
-  //   if (document.cookie && document.cookie !== "") {
-  //     const cookies = document.cookie.split(";");
-  //     for (let i = 0; i < cookies.length; i++) {
-  //       const cookie = cookies[i].trim();
-  //       if (cookie.substring(0, name.length + 1) === name + "=") {
-  //         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-  //         break;
-  //       }
-  //     }
-  //   }
-  //   return cookieValue;
-  // }
+  // To get csrf token
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 
   // // handle click event of the Add button
-  // const handleAddClick = () => {
-  //   let all_variants = JSON.parse(props.variants.replaceAll("'", '"')).map(
-  //     (el) => el.id
-  //   );
-  //   let selected_variants = productVariants.map((el) => el.option);
-  //   let available_variants = all_variants.filter(
-  //     (entry1) => !selected_variants.some((entry2) => entry1 == entry2)
-  //   );
-  //   setProductVariant([
-  //     ...productVariants,
-  //     {
-  //       option: available_variants[0],
-  //       tags: [],
-  //     },
-  //   ]);
-  // };
+  const handleAddClick = () => {
+    // let all_variants = JSON.parse(props.variants.replaceAll("'", '"')).map(
+    //   (el) => el.id
+    // );
+    let all_variants = variants.map(
+      (el) => el.id
+    );
+    let selected_variants = productVariants.map((el) => el.option);
+    let available_variants = all_variants.filter(
+      (entry1) => !selected_variants.some((entry2) => entry1 == entry2)
+    );
+    setProductVariants([
+      ...productVariants,
+      {
+        option: available_variants[0],
+        tags: [],
+      },
+    ]);
+  };
 
-  // // handle input change on tag input
-  // const handleInputTagOnChange = (value, index) => {
-  //   let product_variants = [...productVariants];
-  //   product_variants[index].tags = value;
-  //   setProductVariant(product_variants);
+  // handle input change on tag input
+  const handleInputTagOnChange = (value, index) => {
+    let product_variants = [...productVariants];
+    product_variants[index].tags = value;
+    setProductVariant(product_variants);
 
-  //   checkVariant();
-  // };
+    checkVariant();
+  };
 
-  // // remove product variant
-  // const removeProductVariant = (index) => {
-  //   let product_variants = [...productVariants];
-  //   product_variants.splice(index, 1);
-  //   setProductVariant(product_variants);
-  // };
+  // remove product variant
+  const removeProductVariant = (index) => {
+    let product_variants = [...productVariants];
+    product_variants.splice(index, 1);
+    setProductVariant(product_variants);
+  };
 
-  // // check the variant and render all the combination
-  // const checkVariant = () => {
-  //   let tags = [];
+  // check the variant and render all the combination
+  const checkVariant = () => {
+    let tags = [];
 
-  //   productVariants.filter((item) => {
-  //     tags.push(item.tags);
-  //   });
+    productVariants.filter((item) => {
+      tags.push(item.tags);
+    });
 
-  //   setProductVariantPrices([]);
+    setProductVariantPrices([]);
 
-  //   getCombn(tags).forEach((item) => {
-  //     setProductVariantPrices((productVariantPrice) => [
-  //       ...productVariantPrice,
-  //       {
-  //         title: item,
-  //         price: 0,
-  //         stock: 0,
-  //       },
-  //     ]);
-  //   });
-  // };
+    getCombn(tags).forEach((item) => {
+      setProductVariantPrices((productVariantPrice) => [
+        ...productVariantPrice,
+        {
+          title: item,
+          price: 0,
+          stock: 0,
+        },
+      ]);
+    });
+  };
 
-  // // combination algorithm
-  // function getCombn(arr, pre) {
-  //   pre = pre || "";
-  //   if (!arr.length) {
-  //     return pre;
-  //   }
-  //   let ans = arr[0].reduce(function (ans, value) {
-  //     return ans.concat(getCombn(arr.slice(1), pre + value + "/"));
-  //   }, []);
-  //   return ans;
-  // }
+  // combination algorithm
+  function getCombn(arr, pre) {
+    pre = pre || "";
+    if (!arr.length) {
+      return pre;
+    }
+    let ans = arr[0].reduce(function (ans, value) {
+      return ans.concat(getCombn(arr.slice(1), pre + value + "/"));
+    }, []);
+    return ans;
+  }
 
-  // const handleProductVariantPrice = (e) =>{
-  //   var index = e.target.getAttribute('data-index')
-  //   var productVariantPrice = productVariantPrices[index]
+  const handleProductVariantPrice = (e) =>{
+    var index = e.target.getAttribute('data-index')
+    var productVariantPrice = productVariantPrices[index]
 
-  //   if(e.target.name == 'price'){
-  //     productVariantPrice.price = e.target.value
-  //   }else if(e.target.name == 'stock'){
-  //     productVariantPrice.stock = e.target.value
-  //   }
-  // }
-  // // Save product
-  // let saveProduct = (event) => {
-  //   event.preventDefault();
-  //   const csrftoken = getCookie("csrftoken");
-  //   // TODO : write your code here to save the product
-  //   let formField = new FormData();
+    if(e.target.name == 'price'){
+      productVariantPrice.price = e.target.value
+    }else if(e.target.name == 'stock'){
+      productVariantPrice.stock = e.target.value
+    }
+  }
+  // Save product
+  let saveProduct = (event) => {
+    event.preventDefault();
+    const csrftoken = getCookie("csrftoken");
+    // TODO : write your code here to save the product
+    let formField = new FormData();
 
-  //   formField.append("title", title);
-  //   formField.append("sku", sku);
-  //   formField.append("description", description);
-  //   var product = {
-  //     title: title,
-  //     sku: sku,
-  //     description: description,
-  //   };
+    formField.append("title", title);
+    formField.append("sku", sku);
+    formField.append("description", description);
+    var product = {
+      title: title,
+      sku: sku,
+      description: description,
+    };
 
-  //   axios({
-  //     method: "post",
-  //     headers: { "X-CSRFToken": csrftoken },
-  //     url: "http://localhost:8000/api/product/",
-  //     data: {
-  //       product: product,
-  //       productVariants: productVariants,
-  //       productVariantPrices: productVariantPrices,
-  //     },
-  //   }).then((res) => {
-  //     console.log(res.data);
-  //   });
-  // };
-
+    axios({
+      method: "post",
+      headers: { "X-CSRFToken": csrftoken },
+      url: location.origin+"/api/product/",
+      data: {
+        product: product,
+        productVariants: productVariants,
+        productVariantPrices: productVariantPrices,
+      },
+    }).then((res) => {
+      console.log(res.data);
+      if(res.data.error == false){
+        location.reload()
+      }else if (res.data.error == true){
+        // setMessage("Data insertion failed! Please try again.")
+        setMessage(JSON.stringify(res.data.message))
+      }
+    });
+  };
+  // console.log(productVariants)
   return (
     <div>
       <section>
@@ -238,7 +282,7 @@ const UpdateProduct = (props) => {
             </div>
           </div>
 
-          {/* <div className="col-md-6">
+          <div className="col-md-6">
             <div className="card shadow mb-4">
               <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 className="m-0 font-weight-bold text-primary">Variants</h6>
@@ -254,14 +298,16 @@ const UpdateProduct = (props) => {
                             className="form-control"
                             defaultValue={element.option}
                           >
-                            {JSON.parse(
-                              props.variants.replaceAll("'", '"')
-                            ).map((variant, index) => {
+                            {
+                            // JSON.parse(
+                            //   props.variants.replaceAll("'", '"')
+                            // )
+                            variants.map((variant, index) => {
                               return (
                                 <option key={index} value={variant.id}>
                                   {variant.title}
                                 </option>
-                              );
+                              )
                             })}
                           </select>
                         </div>
@@ -329,6 +375,7 @@ const UpdateProduct = (props) => {
                                   className="form-control" 
                                   type="text" 
                                   name="price"
+                                  defaultValue={productVariantPrice.price}
                                   data-index={index}
                                   onChange={handleProductVariantPrice}
                                 />
@@ -338,6 +385,7 @@ const UpdateProduct = (props) => {
                                 className="form-control" 
                                 type="text"
                                 name="stock" 
+                                defaultValue={productVariantPrice.stock}
                                 data-index={index}
                                 onChange={handleProductVariantPrice}
                                 />
@@ -351,7 +399,7 @@ const UpdateProduct = (props) => {
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
 
         <button
